@@ -6,10 +6,14 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Http\JsonResponse;
 
 class PlaceController extends Controller
 {
-    public function generalList()
+    /**
+     * Retrieves a list of places from the cache and retrieves weather data for each place.
+     */
+    public function generalList(): JsonResponse
     {
         $places = Cache::get('places', []);
 
@@ -20,7 +24,10 @@ class PlaceController extends Controller
         return response()->json($weatherData);
     }
 
-    public function listByCurrentBaseWeather()
+    /**
+     * Retrieves a list of places from the cache and categorizes them by current base weather.
+     */
+    public function listByCurrentBaseWeather(): JsonResponse
     {
         $places = $this->generalList()->original;
 
@@ -33,7 +40,10 @@ class PlaceController extends Controller
         return response()->json($categorized);
     }
 
-    public function singleCurrentDetails($geoapifyId)
+    /**
+     * Retrieves the current details of a single place based on its Geoapify ID.
+     */
+    public function singleCurrentDetails(string $geoapifyId): JsonResponse
     {
         $places = Cache::get('places', []);
         $place = collect($places)->firstWhere('geoapifyId', $geoapifyId);
@@ -45,7 +55,10 @@ class PlaceController extends Controller
         return response()->json(['error' => 'Place not found'], 404);
     }
 
-    public function singleGetFullDetails($geoapifyId)
+    /**
+     * Retrieves the full details of a single place including current details and forecast based on Geoapify ID.
+     */
+    public function singleGetFullDetails(string $geoapifyId): JsonResponse
     {
         $currentDetails = $this->singleCurrentDetails($geoapifyId)->original;
         $forecast = $this->getForecastData($currentDetails['latitude'], $currentDetails['longitude']);
@@ -56,7 +69,10 @@ class PlaceController extends Controller
         ]);
     }
 
-    private function getWeatherData($place)
+    /**
+     * Retrieves weather data for a given place using the OpenWeatherMap API.
+     */
+    private function getWeatherData($place): ?array
     {
         $apiKey = env('OPENWEATHER_API_KEY');
         $response = Http::get("https://api.openweathermap.org/data/2.5/weather?lat={$place['latitude']}&lon={$place['longitude']}&appid=$apiKey&units=metric");
@@ -70,7 +86,10 @@ class PlaceController extends Controller
         return null;
     }
 
-    private function getForecastData($lat, $lon)
+    /**
+     * Retrieves the forecast data for a given latitude and longitude using the OpenWeatherMap API.
+     */
+    private function getForecastData(float $lat, float $lon): ?array
     {
         $apiKey = env('OPENWEATHER_API_KEY');
         $response = Http::get("https://api.openweathermap.org/data/2.5/forecast?lat=$lat&lon=$lon&appid=$apiKey&units=metric");
