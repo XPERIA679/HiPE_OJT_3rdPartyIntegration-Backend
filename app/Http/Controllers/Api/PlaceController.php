@@ -101,7 +101,10 @@ class PlaceController extends Controller
         return null;
     }
 
-    public function currentLocation(Request $request)
+    /**
+     * Store the current location (latitude and longitude) in the cache.
+     */
+    public function currentLocation(Request $request): JsonResponse
     {
         $latitude = $request->input('latitude');
         $longitude = $request->input('longitude');
