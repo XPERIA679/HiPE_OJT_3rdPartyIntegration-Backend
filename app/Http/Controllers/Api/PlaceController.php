@@ -10,6 +10,10 @@ use Illuminate\Http\JsonResponse;
 
 class PlaceController extends Controller
 {
+    private const OPENWEATHER_WEATHER_ENDPOINT = 'https://api.openweathermap.org/data/2.5/weather';
+    private const OPENWEATHER_FORECAST_ENDPOINT = 'https://api.openweathermap.org/data/2.5/forecast';
+    private const OPENWEATHER_API_UNIT = 'metric';
+    
     /**
      * Retrieves a list of places from the cache and retrieves weather data for each place.
      */
@@ -75,7 +79,12 @@ class PlaceController extends Controller
     private function getWeatherData($place): ?array
     {
         $apiKey = env('OPENWEATHER_API_KEY');
-        $response = Http::get("https://api.openweathermap.org/data/2.5/weather?lat={$place['latitude']}&lon={$place['longitude']}&appid=$apiKey&units=metric");
+        $response = Http::get(self::OPENWEATHER_WEATHER_ENDPOINT, [
+            'lat' => $place['latitude'],
+            'lon' => $place['longitude'],
+            'appid' => $apiKey,
+            'units' => self::OPENWEATHER_API_UNIT
+        ]);
 
         if ($response->successful()) {
             $place['weather'] = $response->json()['weather'];
@@ -92,7 +101,12 @@ class PlaceController extends Controller
     private function getForecastData(float $lat, float $lon): ?array
     {
         $apiKey = env('OPENWEATHER_API_KEY');
-        $response = Http::get("https://api.openweathermap.org/data/2.5/forecast?lat=$lat&lon=$lon&appid=$apiKey&units=metric");
+        $response = Http::get(self::OPENWEATHER_FORECAST_ENDPOINT, [
+            'lat' => $lat,
+            'lon' => $lon,
+            'appid' => $apiKey,
+            'units' => self::OPENWEATHER_API_UNIT
+        ]);
 
         if ($response->successful()) {
             return $response->json();
