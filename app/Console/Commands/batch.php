@@ -13,7 +13,7 @@ class batch extends Command
      *
      * @var string
      */
-    protected $signature = 'batch:cache {--limit=10}';
+    protected $signature = 'batch:cache {--limit=9}';
 
     /**
      * The console command description.
@@ -29,11 +29,18 @@ class batch extends Command
     {
         $limit = $this->option('limit');
         $apiKey = env('GEOAPIFY_API_KEY');
+        $userLocation = Cache::get('user_location');
+        $latitude = $userLocation['latitude'] ?? null;
+        $longitude = $userLocation['longitude'] ?? null;
+        
+        // Print latitude and longitude for debugging
+        $this->info("User latitude: $latitude, User longitude: $longitude");
 
         $response = Http::get('https://api.geoapify.com/v2/places', [
             'categories' => 'populated_place.city,populated_place.town',
             'filter' => 'rect:114.1036921,4.3833333,126.803083,21.321928',
             'limit' => $limit,
+            'bias' => "proximity:$longitude,$latitude",
             'apiKey' => $apiKey,
         ]);
 

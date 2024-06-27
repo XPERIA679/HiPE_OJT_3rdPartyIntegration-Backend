@@ -12,3 +12,5 @@ Route::get('/place/{geoapifyId}/details', [PlaceController::class, 'singleGetFul
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
+
+Route::post('/current-location', [PlaceController::class, 'currentLocation']);

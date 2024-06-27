@@ -100,4 +100,20 @@ class PlaceController extends Controller
 
         return null;
     }
+
+    public function currentLocation(Request $request)
+    {
+        $latitude = $request->input('latitude');
+        $longitude = $request->input('longitude');
+
+        Cache::put('user_location', [
+            'latitude' => $latitude,
+            'longitude' => $longitude
+        ], now()->addDay());
+
+        return response()->json([
+            'latitude' => $latitude,
+            'longitude' => $longitude
+        ], 200);
+    }
 }
