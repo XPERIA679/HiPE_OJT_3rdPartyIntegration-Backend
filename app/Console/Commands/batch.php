@@ -31,8 +31,8 @@ class batch extends Command
         $apiKey = env('GEOAPIFY_API_KEY');
 
         $response = Http::get('https://api.geoapify.com/v2/places', [
-            'categories' => 'commercial',
-            'filter' => 'place:5150807225ccae5e4059e33213b12d802940f00101f90126c3060000000000c0020b',
+            'categories' => 'populated_place.city,populated_place.town',
+            'filter' => 'rect:114.1036921,4.3833333,126.803083,21.321928',
             'limit' => $limit,
             'apiKey' => $apiKey,
         ]);
