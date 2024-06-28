@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Events\CacheUpdated;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
@@ -33,6 +34,7 @@ class batch extends Command
         $response = Http::get('https://api.geoapify.com/v2/places', [
             'categories' => 'populated_place.city,populated_place.town',
             'filter' => 'rect:114.1036921,4.3833333,126.803083,21.321928',
+            'bias' => 'proximity:121.0993541,14.633108399864',
             'limit' => $limit,
             'apiKey' => $apiKey,
         ]);
@@ -53,6 +55,8 @@ class batch extends Command
             Cache::put('places', $cachedData, now()->addHours(24));
             $this->info('Places cached successfully.');
             $this->info(print_r($cachedData, true));
+
+            event(new CacheUpdated('Cache has been updated'));
         } else {
             $this->error('Failed to fetch places from Geoapify API.');
             $this->error($response->body());
