@@ -8,6 +8,8 @@ Route::get('/places', [PlaceController::class, 'generalList']);
 Route::get('/places/weather', [PlaceController::class, 'listByCurrentBaseWeather']);
 Route::get('/place/{geoapifyId}', [PlaceController::class, 'singleCurrentDetails']);
 Route::get('/place/{geoapifyId}/details', [PlaceController::class, 'singleGetFullDetails']);
+Route::post('/current-location', [PlaceController::class, 'currentLocation']);
+
 
 Route::get('/user', function (Request $request) {
     return $request->user();
